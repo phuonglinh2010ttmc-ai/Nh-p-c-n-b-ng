@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Nhịp Cân Bằng</title>
+<style>
+:root{--ink:#17323B;--deep:#0F4C5C;--teal:#1B7F79;--sky:#D3E6F3;--sun:#F2B544;--line:#C9DAD6;--bg:#F5FAF9;--mut:#44646C;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:560px;margin:0 auto;padding:14px 16px 48px}
+header{display:flex;align-items:center;gap:10px;padding:6px 0 12px}
+header b{font-size:19px;color:var(--deep)}
+.pg{height:6px;background:var(--sky);border-radius:9px;overflow:hidden;margin-bottom:20px}
+.pg i{display:block;height:100%;background:var(--teal);transition:width .3s}
+h1{font-size:30px;line-height:1.15;margin:.2em 0 .5em;color:var(--deep)}
+h2{font-size:22px;margin:.2em 0 .5em;color:var(--deep)}
+h3{font-size:18px;margin:0 0 4px;color:var(--deep)}
+p{margin:0 0 12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 16px 10px;margin:0 0 14px}
+.card.p{padding:16px}
+.q{padding:14px 0;border-bottom:1px solid var(--line)}
+.q:last-child{border:0}
+.q>p{margin:0 0 10px}
+.q.bad{outline:2px solid var(--sun);outline-offset:4px;border-radius:8px}
+.sc{display:flex;gap:6px}
+.sc button{flex:1;min-width:0;height:46px;border:1.5px solid var(--teal);background:#fff;color:var(--deep);border-radius:12px;font:inherit;font-weight:700;cursor:pointer}
+.sc button[aria-checked=true]{background:var(--teal);color:#fff}
+.sc.tx{flex-direction:column}
+.sc.tx button{flex:none;height:auto;min-height:46px;padding:8px 14px;text-align:left;font-weight:600}
+small.l{display:block;min-height:1.5em;margin-top:6px;color:var(--mut);font-size:15px}
+.in{width:100%;height:48px;border:1.5px solid var(--teal);border-radius:12px;padding:0 12px;font:inherit}
+.btn{height:50px;padding:0 22px;border-radius:12px;border:0;background:var(--deep);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.btn.g{background:#fff;color:var(--deep);border:1.5px solid var(--deep)}
+.btn:disabled{opacity:.45;cursor:default}
+.nav{display:flex;gap:10px;justify-content:space-between;margin-top:16px}
+.err{color:#7A4300;background:#FFF3DC;border-radius:10px;padding:10px 12px;margin-top:12px}
+.err:empty{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.chips button{min-height:44px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--teal);background:#fff;color:var(--deep);font:inherit;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--teal);color:#fff}
+.big{font-size:34px;font-weight:800;color:var(--deep);line-height:1.1}
+.big span{font-size:17px;font-weight:600;color:var(--mut)}
+.mt{position:relative;height:14px;background:var(--sky);border-radius:9px;margin:38px 0 8px}
+.mt b{position:absolute;top:0;bottom:0;background:#9CC5BE;border-radius:9px}
+.mt i{position:absolute;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--sun);border:3px solid var(--deep)}
+.mt em{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-style:normal;font-weight:800;font-size:19px;color:var(--deep)}
+.ax{display:flex;justify-content:space-between;gap:6px;font-size:14px;color:var(--mut)}
+.ax span:nth-child(2){text-align:center}
+.note{background:var(--sky);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+.help{background:#FFF3DC;border-left:5px solid var(--sun);border-radius:12px;padding:12px 14px;margin:0 0 14px}
+ul.ad{padding-left:20px;margin:6px 0 4px}
+ul.ad li{margin-bottom:8px}
+a{color:var(--deep);font-weight:600}
+input[type=checkbox]{width:22px;height:22px;vertical-align:-5px;margin-right:8px}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+footer{font-size:14px;color:var(--mut);margin-top:22px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><div class="w"><div id="app"></div>
+<footer>Bản mẫu thử nghiệm của nhóm nghiên cứu <span id="sch"></span>. Không dùng để chẩn đoán. Các mốc so sánh dựa trên 391 học sinh một trường tại thời điểm tuần ôn thi giữa học kì 1 năm học 2026–2027.</footer></div>
+<script>
+/* ===== CẤU HÌNH: chỉnh ở đây ===== */
+const CFG={
+ SUBMIT_URL:"", // dán URL Google Apps Script (kết thúc bằng /exec). Để trống thì ẩn phần gửi dữ liệu.
+ SCHOOL:"[Tên trường]",
+ COUNSELOR:"[Điền liên hệ giáo viên tư vấn học đường]",
+ // Danh sách câu "Điều gì giúp em thư giãn nhất sau giờ học?". k: mã (screen, rest, music, chat, move, hobby, pet có gợi ý sẵn)
+ RELAX:[{k:"screen",t:"Giải trí trên màn hình"},{k:"rest",t:"Nghỉ ngơi, ngủ"},{k:"music",t:"Nghe nhạc"},{k:"chat",t:"Trò chuyện với bạn bè, gia đình"},{k:"move",t:"Vận động, ra ngoài trời"},{k:"hobby",t:"Sở thích, đọc, sáng tạo"},{k:"pet",t:"Chơi với thú cưng"}]
+};
+const ACT={rest:"Nghỉ mắt, nằm thư giãn hoặc chợp mắt ngắn",music:"Nghe một hai bài nhạc em thích",chat:"Nhắn tin hoặc trò chuyện với một người bạn hay người thân",move:"Đi dạo quanh nhà hoặc sân trường",hobby:"Dành thời gian cho sở thích như vẽ, viết hoặc đọc vài trang",pet:"Chơi với thú cưng"};
+/* ===== Nội dung thang đo (Phụ lục 1) ===== */
+const W=["Em cảm thấy vui vẻ và có tinh thần tốt","Em cảm thấy bình tĩnh và thư thái","Em cảm thấy năng động và tràn đầy sinh lực","Em thức dậy với cảm giác tươi tỉnh và được nghỉ ngơi đầy đủ","Cuộc sống hằng ngày của em có nhiều điều làm em hứng thú"];
+const WL=["Không lúc nào","Thỉnh thoảng","Ít hơn một nửa thời gian","Hơn một nửa thời gian","Hầu hết thời gian","Mọi lúc"];
+const E=["Sự cạnh tranh quá nhiều giữa các bạn cùng lớp khiến em chịu nhiều áp lực học tập.","Em cảm thấy chịu nhiều áp lực trong việc học hằng ngày.","Việc học lên cao và tìm việc làm sau này khiến em chịu nhiều áp lực học tập.","Cha mẹ quá quan tâm đến điểm số học tập của em, điều này khiến em chịu nhiều áp lực.","Em cảm thấy mình làm thầy cô thất vọng khi kết quả kiểm tra/thi không như mong muốn.","Em cảm thấy mình làm cha mẹ thất vọng khi kết quả kiểm tra/thi thấp.","Điểm số học tập rất quan trọng đối với tương lai của em, thậm chí có thể quyết định cả cuộc đời em.","Em rất không hài lòng với điểm số học tập của mình.","Em thường thiếu tự tin về điểm số của mình.","Em rất khó tập trung trong giờ học.","Em cảm thấy căng thẳng khi mình không đạt được tiêu chuẩn do chính em đặt ra.","Khi không đạt được kỳ vọng của bản thân, em cảm thấy mình chưa đủ giỏi.","Em thường không ngủ được và lo lắng khi không đạt được mục tiêu em đã đặt ra.","Em cảm thấy có quá nhiều bài tập về nhà.","Em cảm thấy có quá nhiều việc học ở trường.","Em cảm thấy ở trường có quá nhiều bài kiểm tra/kỳ thi."];
+const EL=[,"Hoàn toàn không đồng ý","Không đồng ý","Phân vân","Đồng ý","Hoàn toàn đồng ý"];
+const AR=[[0,4],[4,7],[7,10],[10,13],[13,16]]; // 5 khía cạnh ESSA: áp lực từ việc học, lo lắng điểm số, nản lòng, kỳ vọng bản thân, khối lượng bài vở
+/* ===== Trạng thái (chỉ trong bộ nhớ, không lưu trình duyệt) ===== */
+const ST=['intro','info','who','e0','e1','e2','e3','relax','res'];
+const $=s=>document.querySelector(s),app=$('#app'),num=s=>{const x=parseFloat(String(s).replace(',','.'));return isNaN(x)?null:x};
+let S=0,A,sent=false;
+const fresh=()=>{A={khoi:null,ngu:'',vd:null,ht:'',w:Array(5).fill(null),e:Array(16).fill(null),relax:[]};sent=false};fresh();
+$('#sch').textContent=CFG.SCHOOL;
+const sc=(a,i,vals,labs)=>`<div class="sc${labs?' tx':''}" role="radiogroup">${vals.map(v=>`<button type="button" role="radio" aria-checked="${(i==null?A[a]:A[a][i])===v}" data-a="${a}" ${i==null?'':`data-i="${i}"`} data-v="${v}">${labs?labs[v]:v}</button>`).join('')}</div>`;
+const qb=(id,t,a,i,vals,labs,hint)=>`<div class="q" id="${id}"><p>${t}</p>${sc(a,i,vals,labs)}${labs?'':`<small class="l">${hint||''}</small>`}</div>`;
+const nav=l=>`<div class="err" id="err" role="alert"></div><div class="nav"><button class="btn g" data-go="${S-1}">Quay lại</button><button class="btn" data-next>${l||'Tiếp tục'}</button></div>`;
+const hdr=()=>`<header><svg width="40" height="24" viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12Q8 0 14 12T26 12T38 12" fill="none" stroke="#1B7F79" stroke-width="3.5" stroke-linecap="round"/></svg><b>Nhịp Cân Bằng</b></header><div class="pg"><i style="width:${S/(ST.length-1)*100}%"></i></div>`;
+function calc(){const sum=(a,b)=>A.e.slice(a,b).reduce((x,y)=>x+y,0);return{w:A.w.reduce((x,y)=>x+y,0)*4,e:sum(0,16),asp:AR.map(r=>sum(r[0],r[1])),ngu:num(A.ngu),ht:num(A.ht)}}
+function meter(t,v,mn,mx,a,b,cmp,hint){const p=x=>+((x-mn)/(mx-mn)*100).toFixed(1),l=Math.min(97,Math.max(3,p(v)));
+ return `<section class="card p"><h3>${t}</h3><div class="big">${v}<span> / ${mx}</span></div><div class="mt" role="img" aria-label="${t}: ${v}. Vùng của đa số bạn từ ${a} đến ${b}"><b style="left:${p(a)}%;width:${p(b)-p(a)}%"></b><i style="left:${l}%"><em>${v}</em></i></div><div class="ax"><span>${mn}</span><span>Vùng xám: đa số bạn (${a}–${b})</span><span>${mx}</span></div><p style="margin-top:12px"><b>${cmp}</b> ${hint}</p></section>`}
+function view(){const s=ST[S];
+ if(s==='intro')return `<h1>Nhìn lại nhịp học của em</h1><p>Nhịp Cân Bằng giúp em xem áp lực học tập và tinh thần của mình so với các bạn trong trường.</p><div class="note">Không cần tài khoản, không hỏi họ tên. Điểm được tính ngay trên điện thoại của em. Đây không phải là chẩn đoán.</div><p>Gồm 25 câu ngắn.</p><button class="btn" data-go="1">Bắt đầu</button>`;
+ if(s==='info')return `<h2>Vài thông tin chung</h2><div class="card">`+qb('q-khoi','Em học khối nào?','khoi',null,[10,11,12])+`<div class="q" id="q-ngu"><p><label for="ngu">Em ngủ trung bình mấy giờ mỗi đêm đi học?</label></p><input class="in" id="ngu" data-f="ngu" inputmode="decimal" placeholder="Ví dụ 6,5" value="${A.ngu}"><small class="l">Nhập từ 4 đến 12 giờ.</small></div>`+qb('q-vd','Trong 7 ngày qua, em có mấy ngày vận động từ 60 phút trở lên?','vd',null,[0,1,2,3,4,5,6,7],null,'Chọn số ngày từ 0 đến 7.')+`<div class="q" id="q-ht"><p><label for="ht">Mỗi tuần em học thêm ngoài trường khoảng bao nhiêu giờ?</label></p><input class="in" id="ht" data-f="ht" inputmode="decimal" placeholder="Ví dụ 8 (nhập 0 nếu không học thêm)" value="${A.ht}"><small class="l">Nhập từ 0 đến 60 giờ.</small></div></div>`+nav();
+ if(s==='who')return `<h2>Hai tuần vừa qua</h2><p>Trong 2 tuần vừa qua, em thấy mỗi câu dưới đây đúng với mình đến đâu?</p><div class="card">`+W.map((t,i)=>qb('qw'+i,t,'w',i,[5,4,3,2,1,0],WL)).join('')+`</div>`+nav();
+ if(/^e\d$/.test(s)){const k=+s[1];return `<h2>Em đồng ý đến đâu?</h2><p>Trang ${k+1}/4. Chọn mức đúng nhất với em.</p><div class="card">`+E.slice(k*4,k*4+4).map((t,j)=>qb('qe'+(k*4+j),t,'e',k*4+j,[1,2,3,4,5],EL)).join('')+`</div>`+nav();}
+ if(s==='relax')return `<h2>Điều gì giúp em thư giãn nhất sau giờ học?</h2><p>Không bắt buộc. Em có thể chọn nhiều mục.</p><div class="chips">`+CFG.RELAX.concat([{k:'other',t:'Khác'},{k:'none',t:'Em không có thời gian thư giãn'}]).map(r=>`<button type="button" data-r="${r.k}" aria-pressed="${A.relax.includes(r.k)}">${r.t}</button>`).join('')+`</div><div class="nav"><button class="btn g" data-go="${S-1}">Quay lại</button><button class="btn" data-go="${S+1}">Xem kết quả</button></div>`;
+ return result();}
+function result(){const R=calc(),rx=A.relax,none=rx.includes('none'),adv=[],O=[];
+ const eC=R.e>=61?'Cao hơn đa số bạn trong trường.':R.e<=50?'Thấp hơn đa số bạn trong trường.':'Tương đương đa số bạn trong trường.';
+ const wC=R.w>=60?'Cao hơn đa số bạn trong trường.':R.w<=32?'Thấp hơn đa số bạn trong trường.':'Tương đương đa số bạn trong trường.';
+ if(R.e>=61)adv.push('Áp lực học tập của em đang cao hơn đa số bạn. Thử chia nhỏ việc, chọn vài việc ưu tiên mỗi ngày và xen những lần nghỉ ngắn giữa các lần học.');
+ if(R.e<=50)adv.push('Áp lực học tập của em thấp hơn đa số bạn. Em có thể giữ nhịp học hiện tại.');
+ if(R.asp[0]>=15)adv.push('Áp lực từ việc học đang khá nặng. Em có thể nói với một người tin cậy về điều làm em áp lực nhất, và đặt mục tiêu nhỏ, vừa sức cho từng ngày.');
+ if(R.asp[2]>=12)adv.push('Em hay thấy nản lòng. Mỗi ngày thử ghi lại một việc em đã làm được, dù nhỏ.');
+ if(R.asp[3]>=12)adv.push('Em đặt kỳ vọng khá cao cho bản thân. Thử chia mục tiêu thành từng bước nhỏ. Chưa đạt một mục tiêu không có nghĩa là em chưa đủ giỏi.');
+ if(R.asp[4]>=12)adv.push('Khối lượng bài vở đang nhiều. Hãy liệt kê việc cần làm, chọn 2–3 việc quan trọng nhất để làm trước.');
+ if(R.ngu<8)adv.push(`Em ngủ khoảng ${String(R.ngu).replace('.',',')} giờ mỗi đêm. Lứa tuổi 13–18 được khuyến nghị ngủ 8–10 giờ, nên em thử chọn một giờ đi ngủ cố định và giữ đều mỗi ngày.`);
+ adv.push(`Mốc khuyến nghị là trung bình 60 phút vận động mỗi ngày. Tuần qua em có ${A.vd} ngày vận động từ 60 phút trở lên.`);
+ if(none)adv.push('Em chưa có nhiều thời gian thư giãn. Chỉ cần vài phút cũng được: hít thở sâu, nghe một bài nhạc hoặc nhắn hỏi thăm một người bạn.');
+ let act='';if(!none){const pk=rx.filter(k=>ACT[k]).slice(0,2),L=pk.length?pk:['music','move'];act=`<section class="card p"><h3>Gợi ý 10 phút</h3><ul class="ad">${L.map(k=>`<li>${ACT[k]}.</li>`).join('')}</ul>${rx.includes('screen')?'<p>Giải trí trên màn hình cũng là một cách thư giãn. Em chỉ cần xen thêm một hoạt động khác trong ngày.</p>':''}</section>`}
+ const w50=R.w<50?`<div class="note"><b>Điểm WHO-5 dưới 50 không có nghĩa là em bị bệnh.</b> Đây chỉ là mốc nhắc em chú ý đến bản thân, không phải chẩn đoán. Em có thể nói chuyện với một người em tin tưởng.</div>`:'';
+ const w28=R.w<=28?`<div class="help"><b>Em không cần tự chịu một mình.</b> Hãy chia sẻ sớm với một người lớn em tin cậy. Nếu em thấy không an toàn hoặc có ý nghĩ làm hại bản thân, hãy báo ngay cho người lớn ở gần em hoặc gọi Tổng đài <a href="tel:111">111</a>.</div>`:'';
+ const snd=CFG.SUBMIT_URL?`<section class="card p"><h3>Gửi cho nhóm nghiên cứu (không bắt buộc)</h3><p>Nếu em đồng ý, ứng dụng gửi ẩn danh: khối, giờ ngủ, số ngày vận động, giờ học thêm và các điểm số. Không gửi họ tên, lớp hay câu trả lời từng câu. Nhóm chỉ dùng để thống kê.</p><label><input type="checkbox" id="ok"${sent?' disabled':''}>Em đồng ý gửi các thông tin trên</label><div class="nav"><button class="btn" id="snd" disabled>Gửi cho nhóm</button></div><p id="st" role="status" style="margin-top:10px">${sent?'Đã gửi. Cảm ơn em.':''}</p></section>`:'';
+ return `<h2>Kết quả của em</h2><div class="note">Chỉ để em tham khảo. Các mốc so sánh lấy từ khảo sát học sinh trong trường, không dùng để chẩn đoán.</div>`
+ +meter('Áp lực học tập (ESSA)',R.e,16,80,50,61,eC,'Điểm cao nghĩa là áp lực lớn hơn.')
+ +meter('Tinh thần hai tuần qua (WHO-5)',R.w,0,100,32,60,wC,'Điểm cao nghĩa là tinh thần tích cực hơn.')+w50+w28
+ +`<section class="card p"><h3>Lời khuyên cho em</h3><ul class="ad">${adv.map(a=>`<li>${a}</li>`).join('')}</ul></section>`+act
+ +`<section class="card p"><h3>Thông tin hỗ trợ</h3><ul class="ad"><li>Giáo viên chủ nhiệm của em.</li><li>Giáo viên tư vấn học đường: ${CFG.COUNSELOR}</li><li>Tổng đài quốc gia bảo vệ trẻ em <a href="tel:111">111</a>.</li></ul></section>`+snd
+ +`<div class="nav"><button class="btn g" data-go="${S-1}">Quay lại sửa câu trả lời</button><button class="btn g" data-reset>Làm lại từ đầu</button></div>`}
+function miss(){const s=ST[S];
+ if(s==='info'){if(A.khoi==null)return['q-khoi','Em chưa chọn khối.'];const n=num(A.ngu);if(n==null||n<4||n>12)return['q-ngu','Giờ ngủ cần từ 4 đến 12 giờ mỗi đêm. Em nhập lại giúp.'];if(A.vd==null)return['q-vd','Em chưa chọn số ngày vận động.'];const h=num(A.ht);if(h==null||h<0||h>60)return['q-ht','Giờ học thêm cần từ 0 đến 60 giờ mỗi tuần. Em nhập lại giúp.']}
+ if(s==='who'){const i=A.w.indexOf(null);if(i>=0)return['qw'+i,'Em còn câu chưa trả lời.']}
+ if(/^e\d$/.test(s)){const k=+s[1];for(let i=k*4;i<k*4+4;i++)if(A.e[i]==null)return['qe'+i,'Em còn câu chưa trả lời.']}
+ return null}
+function render(){app.innerHTML=hdr()+view();window.scrollTo(0,0);const h=app.querySelector('h1,h2');if(h){h.tabIndex=-1;h.focus({preventScroll:true})}}
+async function send(b){const st=$('#st'),R=calc(),a=R.asp;b.disabled=true;st.textContent='Đang gửi…';
+ const body={khoi:A.khoi,gio_ngu:R.ngu,van_dong:A.vd,hoc_them:R.ht,essa_tong:R.e,a1:a[0],a2:a[1],a3:a[2],a4:a[3],a5:a[4],who5:R.w};
+ try{await fetch(CFG.SUBMIT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});sent=true;$('#ok').disabled=true;st.textContent='Đã gửi. Cảm ơn em.'}
+ catch(e){st.textContent='Chưa gửi được. Kết quả vẫn ở trên, em có thể thử lại.';b.disabled=false}}
+app.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.a){const v=+d.v;if(d.i!==undefined)A[d.a][+d.i]=v;else A[d.a]=v;b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-checked',x===b));const q=b.closest('.q');q.classList.remove('bad');const sm=q.querySelector('small');if(sm&&d.l)sm.textContent=d.l}
+ else if(d.r){const k=d.r,i=A.relax.indexOf(k);if(i>=0)A.relax.splice(i,1);else{A.relax=k==='none'?['none']:A.relax.filter(x=>x!=='none').concat(k)}b.parentNode.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',A.relax.includes(x.dataset.r)))}
+ else if(d.next!==undefined){const m=miss();if(m){const el=$('#'+m[0]);$('#err').textContent=m[1];el.classList.add('bad');el.scrollIntoView({block:'center'});const f=el.querySelector('input,button');if(f)f.focus({preventScroll:true})}else{S++;render()}}
+ else if(d.go!==undefined){S=+d.go;render()}
+ else if(d.reset!==undefined){fresh();S=0;render()}
+ else if(b.id==='snd')send(b)});
+app.addEventListener('input',ev=>{const f=ev.target.dataset.f;if(f){A[f]=ev.target.value;const q=ev.target.closest('.q');q.classList.remove('bad');$('#err').textContent=''}});
+app.addEventListener('change',ev=>{if(ev.target.id==='ok')$('#snd').disabled=!ev.target.checked||sent});
+render();
+</script></body></html>
